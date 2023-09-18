@@ -1,14 +1,27 @@
 import { HttpError } from '../helpers/index.js';
-import ctrWrapper from '../decorators/ctrlWrapper.js';
+import { ctrWrapper } from '../decorators/index.js';
 import Contact from '../models/Contact.js';
 
 export const getList = async (req, res) => {
-  const data = await Contact.find();
+  const { _id: owner } = req.user;
+  const { page = 1, limit = 20, favorite } = req.query;
+  const skip = (page - 1) * limit;
+
+  const data = await Contact.find(
+    { owner, ...(favorite !== undefined && { favorite }) },
+    '',
+    {
+      skip,
+      limit,
+      favorite,
+    }
+  );
   res.json(data);
 };
 
 export const getContactId = async (req, res) => {
   const { id } = req.params;
+
   const data = await Contact.findById(id);
   if (!data) {
     throw HttpError(404);
@@ -17,7 +30,8 @@ export const getContactId = async (req, res) => {
 };
 
 export const postAddContact = async (req, res) => {
-  const data = await Contact.create(req.body);
+  const { _id: owner } = req.user;
+  const data = await Contact.create({ ...req.body, owner });
   res.status(201).json(data);
 };
 
