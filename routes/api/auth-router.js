@@ -2,7 +2,7 @@ import express from 'express';
 import { authController } from '../../controllers/index.js';
 import { validate } from '../../decorators/index.js';
 import { subscription, userSingIn, userSingUp } from '../../models/User.js';
-import { authenticate } from '../../middlewares/index.js';
+import { authenticate, upload } from '../../middlewares/index.js';
 
 const userSingUpValidate = validate(userSingUp);
 const userSingInValidate = validate(userSingIn);
@@ -21,4 +21,10 @@ authRouter.patch(
   authController.subscription
 );
 
+authRouter.patch(
+  '/avatars',
+  authenticate,
+  upload.single('avatar'),
+  authController.updateAvatar
+);
 export default authRouter;

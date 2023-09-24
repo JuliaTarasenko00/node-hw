@@ -31,6 +31,7 @@ export const getContactId = async (req, res) => {
 
 export const postAddContact = async (req, res) => {
   const { _id: owner } = req.user;
+
   const data = await Contact.create({ ...req.body, owner });
   res.status(201).json(data);
 };
